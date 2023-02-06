@@ -1,5 +1,9 @@
 package com.example.springboot.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -45,21 +49,23 @@ import java.util.List;
       "distance": 8115.903194093832
     }
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class YelpSearchResponse {
-    private List<Business> businesess;
-    private String locationTerm;
-    private int total;
 
-    YelpSearchResponse(List<Business> businesess, String locationTerm, int total){
-        this.businesess = businesess;
-        this.locationTerm = locationTerm;
+    public List<Business> businesses;
+    private int total;
+    @JsonCreator
+    public YelpSearchResponse(
+            @JsonProperty("businesses") List<Business> businesses,
+            @JsonProperty("total") int total){
+        this.businesses = businesses;
         this.total = total;
     }
     public YelpSearchResponse rerank(){
-        Collections.sort(businesess, new Comparator<Business>() {
+        Collections.sort(businesses, new Comparator<Business>() {
             @Override
             public int compare(Business b1, Business b2) {
-                return Double.compare(b1.getReview_count() * b1.getRating(), b2.getReview_count() * b2.getRating());
+                return Double.compare(b2.getReview_count() * b2.getRating(),b1.getReview_count() * b1.getRating());
             }
         });
         return this;
