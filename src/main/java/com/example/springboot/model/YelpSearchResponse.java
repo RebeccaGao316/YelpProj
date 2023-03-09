@@ -1,11 +1,9 @@
 package com.example.springboot.model;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 /*
@@ -50,10 +48,12 @@ import java.util.List;
     }
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonDeserialize(builder = YelpSearchResponse.Builder.class)
 public class YelpSearchResponse {
 
-    public List<Business> businesses;
-    private int total;
+    private final List<Business> businesses;
+    private final int total;
+    /*
     @JsonCreator
     public YelpSearchResponse(
             @JsonProperty("businesses") List<Business> businesses,
@@ -61,14 +61,50 @@ public class YelpSearchResponse {
         this.businesses = businesses;
         this.total = total;
     }
+    */
+    private YelpSearchResponse(Builder builder){
+        this.businesses = builder.businesses;
+        this.total = builder.total;
+    }
+
+    public List<Business> getBusinesses() {
+        return businesses;
+    }
+    public int getTotal() {
+        return total;
+    }
+
     public YelpSearchResponse rerank(){
+        MyUtils.rerank(businesses);
+        /*
         Collections.sort(businesses, new Comparator<Business>() {
             @Override
             public int compare(Business b1, Business b2) {
                 return Double.compare(b2.getReview_count() * b2.getRating(),b1.getReview_count() * b1.getRating());
             }
         });
+        */
         return this;
 
+    }
+    @JsonPOJOBuilder(withPrefix = "", buildMethodName = "build")
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class Builder{
+        private List<Business> businesses;
+        private int total;
+        //let id be mandatory
+        public YelpSearchResponse.Builder businesses(List<Business> businesses) {
+            this.businesses = businesses;
+            return this;
+        }
+        public YelpSearchResponse.Builder total(int total) {
+            this.total = total;
+            return this;
+        }
+
+        //Return the finally constructed User object
+        public YelpSearchResponse build() {
+            return new YelpSearchResponse(this);
+        }
     }
 }
