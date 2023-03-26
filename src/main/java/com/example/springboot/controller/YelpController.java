@@ -31,16 +31,18 @@ public class YelpController {
     public ResponseEntity<YelpSearchResponse> rerankOnLocTerm(@RequestParam String location,
                                                               @RequestParam(required = false) String term) throws IOException, InterruptedException {
         YelpSearchResponse beforeRerank = searchLocTerm(location,term,"");
-        YelpSearchResponse afterRerank = beforeRerank.rerank();
-        return ResponseEntity.ok().body(afterRerank);
+        MyUtils.rerank(beforeRerank.getBusinesses());
+        return ResponseEntity.ok().body(beforeRerank);
     }
     @GetMapping("/searchByCategory")
     public ResponseEntity<YelpSearchResponse> searchByCategory(@RequestParam String location,
                                                                @RequestParam String category)
             throws IOException, InterruptedException {
         YelpSearchResponse beforeRerank = searchLocTerm(location,null,category);
-        YelpSearchResponse afterRerank = beforeRerank.rerank();
-        return ResponseEntity.ok().body(afterRerank);
+
+        MyUtils.rerank(beforeRerank.getBusinesses());
+        //YelpSearchResponse afterRerank = beforeRerank.rerank();
+        return ResponseEntity.ok().body(beforeRerank);
     }
 
     public YelpSearchResponse searchLocTerm(@RequestParam String location,

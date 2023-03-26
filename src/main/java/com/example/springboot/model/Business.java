@@ -4,18 +4,38 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import org.springframework.data.annotation.Transient;
 
 import java.util.List;
-@JsonIgnoreProperties(ignoreUnknown = true)
+@Entity
+@Table(name = "business")
 @JsonDeserialize(builder = Business.Builder.class)
 public class Business {
+    @Id
+    @Column(name = "id")
     private final String id;
+    @Column(name = "name")
     private final String name;
     @JsonProperty("review_count")
+    @Column(name = "reviewCount")
     private final int reviewCount;
+    @Column(name = "rating")
     private final double rating;
+
+    @Transient
     @JsonProperty("categories")
     private final List<Category> categories;
+    protected Business() {
+        this.id = null;
+        this.name = null;
+        this.reviewCount = 0;
+        this.rating = 0.0;
+        this.categories = null;
+    }
     /*
     @JsonCreator
     private Business(@JsonProperty("id") String id,
@@ -35,6 +55,8 @@ public class Business {
         this.rating = builder.rating;
         this.categories = builder.categories;
     }
+
+
     public String getName() {
         return name;
     }
@@ -43,7 +65,7 @@ public class Business {
         return rating;
     }
 
-    public int getReview_count() {
+    public int getReviewCount() {
         return reviewCount;
     }
 
@@ -70,7 +92,7 @@ public class Business {
             this.name = name;
             return this;
         }
-        public Builder review_count(int reviewCount) {
+        public Builder reviewCount(int reviewCount) {
             this.reviewCount = reviewCount;
             return this;
         }
