@@ -4,13 +4,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import org.springframework.data.annotation.Transient;
 
-import java.util.List;
+import java.util.Set;
+
 @Entity
 @Table(name = "business")
 @JsonDeserialize(builder = Business.Builder.class)
@@ -28,7 +26,11 @@ public class Business {
 
     @Transient
     @JsonProperty("categories")
-    private final List<Category> categories;
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "business_category",
+            joinColumns = @JoinColumn(name = "businessID"),
+            inverseJoinColumns = @JoinColumn(name = "alias"))
+    private Set<Category> categories;
     protected Business() {
         this.id = null;
         this.name = null;
@@ -69,9 +71,12 @@ public class Business {
         return reviewCount;
     }
 
-    public List<Category> getCategories(){return categories;}
+    public Set<Category> getCategories(){return categories;}
     public String getId() {
         return id;
+    }
+    public void setCategories(Set<Category> categories){
+        this.categories = categories;
     }
     @JsonPOJOBuilder(withPrefix = "", buildMethodName = "build")
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -82,7 +87,7 @@ public class Business {
         private int reviewCount;
         private double rating;
 
-        private List<Category> categories;
+        private Set<Category> categories;
         //let id be mandatory
         public Builder id(String id) {
             this.id = id;
@@ -100,7 +105,7 @@ public class Business {
             this.rating = rating;
             return this;
         }
-        public Builder categories(List<Category> categories) {
+        public Builder categories(Set<Category> categories) {
             this.categories = categories;
             return this;
         }
